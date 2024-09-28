@@ -23,3 +23,6 @@ class User(AbstractUser):
     gender = models.CharField(max_length=6, choices=GenderChoices)
     language = models.CharField(max_length=2, choices=LanguageChoices)
     currency = models.CharField(max_length=3, choices=CurrencyChoices)
+
+    def __str__(self):
+        return self.username
