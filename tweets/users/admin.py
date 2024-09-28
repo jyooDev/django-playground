@@ -15,11 +15,7 @@ class CustomUserAdmin(UserAdmin):
                     "password",
                     "name",
                     "email",
-                    "is_host",
                     "gender",
-                    "language",
-                    "currency"
-
                 )
             }
         ),
@@ -38,4 +34,4 @@ class CustomUserAdmin(UserAdmin):
         ("Important dates", {"fields": ("last_login", "date_joined")}),
     )
     # fields = ("email", "password", "name")
-    list_display = ("username", "email", "name", "is_host")
+    list_display = ("username", "email", "name")
