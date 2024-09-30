@@ -13,5 +13,7 @@ class User(AbstractUser):
     avatar = models.ImageField(blank=True)
     gender = models.CharField(max_length=6, choices=GenderChoices)
 
+    
+
     def __str__(self):
         return self.username

@@ -6,8 +6,15 @@ class Tweet(Date):
     user = models.ForeignKey(
         "users.User",
         on_delete=models.CASCADE,
+        related_name="tweets",
         default = ""
     )
 
+    def likes_ct(self):
+        return self.likes.count()
+
+    likes_ct.short_description = '#likes'
+    
+    
     def __str__(self):
-        return f"{self.user}'s tweet #{self.pk}"
+        return f"{self.user}'s Tweet"
