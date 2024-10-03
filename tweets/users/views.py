@@ -5,11 +5,25 @@ from tweet.serializers import TweetSerializer
 from rest_framework.exceptions import NotFound
 from .models import User
 
-@api_view(["GET"])
+@api_view(["GET", "POST"])
 def see_all_users(request):
     users = User.objects.all()
-    serializer = UserSerializer(users, many=True)
-    return Response(serializer.data)
+    # return Response(serializer.data)
+    if request.method == "GET":
+            serializer = UserSerializer(users, many=True)
+            return Response(serializer.data)
+    elif request.method == "POST":
+        serializer = UserSerializer(data=request.data)
+        if serializer.is_valid():
+            new_user = serializer.save()
+            return Response(
+                 {
+                    "message" : "New user is added.",
+                    "users": UserSerializer(users,many=True).data        
+                 }
+            )
+        else:
+            return Response(serializer.errors)     
 
 
 @api_view(["GET", "POST"])
