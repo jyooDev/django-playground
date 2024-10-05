@@ -9,11 +9,14 @@ class User(AbstractUser):
     username = models.CharField(max_length=150, primary_key=True)
     first_name = models.CharField(max_length=150, editable=False)
     last_name = models.CharField(max_length=150,editable=False)
-    name = models.CharField(max_length=150, default="")
+    name = models.CharField(max_length=150)
     avatar = models.ImageField(blank=True)
     gender = models.CharField(max_length=6, choices=GenderChoices)
 
+    def tweets_ct(self):
+        return self.tweets.count()
     
+    tweets_ct.short_description = "#tweets"
 
     def __str__(self):
         return self.username

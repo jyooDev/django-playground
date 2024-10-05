@@ -1,41 +1,50 @@
 from rest_framework.decorators import api_view
+from rest_framework.views import APIView
 from rest_framework.response import Response
 from .serializers import UserSerializer
 from tweet.serializers import TweetSerializer
 from rest_framework.exceptions import NotFound
 from .models import User
+from tweet.models import Tweet
 
-@api_view(["GET", "POST"])
-def see_all_users(request):
-    users = User.objects.all()
+class Users(APIView):
     # return Response(serializer.data)
-    if request.method == "GET":
-            serializer = UserSerializer(users, many=True)
+    def get_users(self):
+         return User.objects.all()
+    
+    def get(self, request):
+            serializer = UserSerializer(self.get_users(), many=True)
             return Response(serializer.data)
-    elif request.method == "POST":
+    
+    def post(self, request):
         serializer = UserSerializer(data=request.data)
         if serializer.is_valid():
-            new_user = serializer.save()
+            serializer.save()
             return Response(
                  {
                     "message" : "New user is added.",
-                    "users": UserSerializer(users,many=True).data        
+                    "new user": serializer.data,
+                    "users": UserSerializer(self.get_users(),many=True).data        
                  }
             )
         else:
             return Response(serializer.errors)     
 
 
-@api_view(["GET", "POST"])
-def see_user(request, username):
-    try:
-        user = User.objects.get(pk=username)
-    except User.DoesNotExist:
-        raise NotFound
-    if request.method == "GET":
-            serializer = UserSerializer(user)
-            return Response(serializer.data)
-    elif request.method == "POST":
+class SingleUser(APIView):
+    def get_user(self, username):
+        try:
+            return User.objects.get(username=username)
+        except User.DoesNotExist:
+            raise NotFound
+    
+    def get(self, request, username):
+        user = self.get_user(username=username)
+        responses = UserSerializer(user).data
+        return Response(responses)
+    
+    def put(self, request, username):
+        user = self.get_user(username)
         serializer = UserSerializer(
             user,
             data=request.data,
@@ -47,13 +56,27 @@ def see_user(request, username):
         else:
             return Response(serializer.errors)
         
-@api_view()
-def see_tweets_per_user(request, username):
-    try:
-        user = User.objects.get(pk=username)
-        user_tweets = user.tweets.all()
-        print(user_tweets)
-        serializer = TweetSerializer(user_tweets, many=True)
-        return Response(serializer.data)
-    except User.DoesNotExist:
-        raise NotFound
+class UserTweets(APIView):
+    def get_user(self, username):
+        try:
+            return User.objects.get(username=username)
+        except User.DoesNotExist:
+            raise NotFound
+
+    def get(self, request, username):
+        user = self.get_user(username)
+        user_tweets = Tweet.objects.select_related('user').filter(user=user)
+        sorted_user_tweets = sorted(user_tweets, key=lambda t: t.likes_ct(), reverse=True)
+        responses = TweetSerializer(sorted_user_tweets, many=True).data
+        return Response(responses)
+        
+    def post(self, request, username):
+        serializer = TweetSerializer(data=request.data)
+        if serializer.is_valid():
+            serializer.save()
+            return Response(
+                {
+                    "message": f"New tweet is added by {username}.",
+                    "new tweet": serializer.data
+                }
+            )

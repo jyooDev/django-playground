@@ -34,7 +34,6 @@ AUTH_USER_MODEL = "users.User"
 
 CUSTOM_APPS = [
     'tweet.apps.TweetConfig',
-    'like.apps.LikeConfig',
     'users.apps.UsersConfig',
     'date.apps.DateConfig',
 ]

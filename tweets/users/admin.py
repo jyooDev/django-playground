@@ -33,5 +33,4 @@ class CustomUserAdmin(UserAdmin):
         ),
         ("Important dates", {"fields": ("last_login", "date_joined")}),
     )
-    # fields = ("email", "password", "name")
-    list_display = ("username", "email", "name")
+    list_display = ("username", "email", "name", "tweets_ct")
