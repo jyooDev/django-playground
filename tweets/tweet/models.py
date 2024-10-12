@@ -1,13 +1,13 @@
 from django.db import models
 from date.models import Date
+from users.models import User
 # Create your models here.
 class Tweet(Date):
     payload = models.CharField(max_length=180)
     user = models.ForeignKey(
-        "users.User",
+        User,
         on_delete=models.CASCADE,
-        related_name="tweets",
-        default = ""
+        related_name="tweets"
     )
 
     def likes_ct(self):
@@ -25,17 +25,15 @@ class Like(Date):
     user = models.ForeignKey(
         "users.User",
         on_delete=models.CASCADE,
-        default = ""
     )
     tweet = models.ForeignKey(
         "tweet.Tweet",
         on_delete= models.CASCADE,
         related_name="likes",
-        default = ""
     )
 
     def __str__(self):
-        return f"{self.user}'s like"
+        return f"{User.username}'s like"
 
     class Meta:
         constraints = [
